@@ -1,5 +1,9 @@
+#!/usr/bin/env python3
+
 import os
 import base64
+
+import html # s = html.escape( """& < " ' >""" )
 
 from flask import Flask, request
 from model import Message 
@@ -8,7 +12,9 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-
+    """
+    note that the entire html body is returned
+    """
     if request.method == 'POST':
         m = Message(content=request.form['content'])
         m.save()
@@ -25,13 +31,14 @@ def home():
 
 <h2>Wisdom From Your Fellow Classmates</h2>
 """
-    
+
     for m in Message.select():
         body += """
 <div class="message">
 {}
 </div>
-""".format(m.content)
+""".format(m.content.replace('<', '&lt;').replace('>', '&gt;'))
+
 
     return body 
 
